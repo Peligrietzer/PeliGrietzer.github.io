@@ -13,7 +13,7 @@
             margin: 0 auto;
             padding: 40px 20px;
             color: #2c3e50;
-            background-color: #f8f9fa;
+            background-color: #ffffff;
         }
 
         h1 {
@@ -30,7 +30,7 @@
             margin-top: 2.5em;
             margin-bottom: 1em;
             color: #34495e;
-            border-bottom: 2px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
             padding-bottom: 0.5em;
         }
 
@@ -44,12 +44,13 @@
         a {
             color: #3498db;
             text-decoration: none;
-            transition: color 0.2s ease;
+            border-bottom: 1px solid transparent;
+            transition: border-bottom-color 0.2s ease;
         }
 
         a:hover {
-            color: #2980b9;
-            text-decoration: underline;
+            border-bottom-color: #3498db;
+            text-decoration: none;
         }
 
         ul {
@@ -59,25 +60,19 @@
 
         ul li {
             margin-bottom: 1em;
-            padding: 1.25em;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: all 0.2s ease;
+            padding: 0.5em 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        ul li:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        ul li:last-child {
+            border-bottom: none;
         }
 
         .contact {
             margin-top: 3em;
-            padding: 1.5em;
-            background-color: white;
-            border-radius: 8px;
+            padding: 1.5em 0;
             text-align: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid #e9ecef;
         }
 
         .contact p {
@@ -96,10 +91,6 @@
 
             h2 {
                 font-size: 1.5em;
-            }
-
-            ul li {
-                padding: 1em;
             }
         }
     </style>
