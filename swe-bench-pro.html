@@ -224,6 +224,92 @@
     </p>
   </div>
 
+  <hr style="border:none;border-top:1px solid #eee;margin:36px 0;">
+
+  <h2 style="font-size:1.25rem;font-weight:700;margin-bottom:8px;color:#2c3e50;">
+    Public / Private Performance Ratio Over Time
+  </h2>
+  <p class="subtitle">
+    At each key date, the ratio of the best public resolve rate to the best private resolve rate.
+    A rising ratio means the public frontier is advancing faster than the private one.
+  </p>
+
+  <div class="chart-container" style="height:380px;">
+    <canvas id="ratioChart"></canvas>
+  </div>
+
+  <div class="annotations">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Best Public</th>
+          <th>Best Private</th>
+          <th>Ratio (pub &divide; priv)</th>
+          <th>Event</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nov 2024</td>
+          <td>4.9%</td>
+          <td>3.6%</td>
+          <td>1.36&times;</td>
+          <td>GPT-4o baseline</td>
+        </tr>
+        <tr>
+          <td>May 2025</td>
+          <td>16.3%</td>
+          <td>9.1%</td>
+          <td>1.79&times;</td>
+          <td>Claude Sonnet 4 raises both frontiers</td>
+        </tr>
+        <tr>
+          <td>Jun 2025</td>
+          <td>16.3%</td>
+          <td>10.1%</td>
+          <td>1.61&times;</td>
+          <td>Gemini 2.5 Pro narrows gap on private</td>
+        </tr>
+        <tr>
+          <td>Aug 2025</td>
+          <td>23.3%</td>
+          <td>17.8%</td>
+          <td>1.31&times;</td>
+          <td>GPT-5 / Claude Opus 4.1 &mdash; gap at its smallest</td>
+        </tr>
+        <tr>
+          <td>Nov 2025</td>
+          <td>45.8%</td>
+          <td>23.4%</td>
+          <td>1.96&times;</td>
+          <td>Live-SWE-agent nearly doubles public frontier</td>
+        </tr>
+        <tr>
+          <td>Dec 2025</td>
+          <td>45.8%</td>
+          <td>23.8%</td>
+          <td>1.92&times;</td>
+          <td>GPT-5.2 slightly lifts private</td>
+        </tr>
+        <tr>
+          <td>Feb 2026</td>
+          <td>56.8%</td>
+          <td>23.8%</td>
+          <td>2.39&times;</td>
+          <td>GPT-5.3-Codex widens gap; private stagnant</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="note">
+      <strong>Interpretation caveat:</strong> the ratio is not a pure measure of contamination or generalization difficulty,
+      because the public and private frontiers are driven by different scaffolds in the later period
+      (Live-SWE-agent and Codex CLI for public vs. SWE-Agent for private). The widening ratio after Nov 2025
+      partly reflects scaffold innovation concentrated on the public set.
+    </p>
+  </div>
+
   <div class="sources">
     <strong>Sources:</strong>
     <a href="https://scale.com/leaderboard/swe_bench_pro_public">SEAL Public Leaderboard</a> &middot;
@@ -274,6 +360,106 @@
 
     const ctx = document.getElementById('sweChart').getContext('2d');
 
+    // --- Ratio chart data ---
+    // At each key date, compute best-public / best-private using step-function frontier values
+    const ratioPoints = [
+      // date          pub    priv   ratio                  event
+      { x: '2024-11-20', y: +(4.9  / 3.6 ).toFixed(2), event: 'GPT-4o baseline' },
+      { x: '2025-05-14', y: +(16.3 / 9.1 ).toFixed(2), event: 'Claude Sonnet 4' },
+      { x: '2025-06-05', y: +(16.3 / 10.1).toFixed(2), event: 'Gemini 2.5 Pro (private)' },
+      { x: '2025-08-07', y: +(23.3 / 17.8).toFixed(2), event: 'GPT-5 / Opus 4.1' },
+      { x: '2025-11-01', y: +(45.8 / 23.4).toFixed(2), event: 'Live-SWE-agent' },
+      { x: '2025-12-11', y: +(45.8 / 23.8).toFixed(2), event: 'GPT-5.2 (private)' },
+      { x: '2026-02-01', y: +(56.8 / 23.8).toFixed(2), event: 'GPT-5.3-Codex' },
+    ];
+
+    const ctx2 = document.getElementById('ratioChart').getContext('2d');
+
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Public / Private ratio',
+          data: ratioPoints,
+          borderColor: '#8e44ad',
+          backgroundColor: 'rgba(142,68,173,0.08)',
+          pointBackgroundColor: '#8e44ad',
+          pointBorderColor: '#8e44ad',
+          pointRadius: 6,
+          pointHoverRadius: 9,
+          borderWidth: 2.5,
+          tension: 0.15,
+          fill: true,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title(items) {
+                const d = new Date(items[0].parsed.x);
+                return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+              },
+              label(item) {
+                const pt = ratioPoints[item.dataIndex];
+                return [
+                  `Ratio: ${item.parsed.y.toFixed(2)}×`,
+                  `Event: ${pt.event}`,
+                ];
+              },
+            },
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            borderColor: '#ddd',
+            borderWidth: 1,
+            titleColor: '#2c3e50',
+            bodyColor: '#34495e',
+            titleFont: { family: 'Roboto', weight: '600', size: 13 },
+            bodyFont: { family: 'Roboto', size: 12 },
+            padding: 12,
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'month',
+              tooltipFormat: 'MMM yyyy',
+              displayFormats: { month: 'MMM yy' },
+            },
+            min: '2024-10-01',
+            max: '2026-03-01',
+            grid: { color: '#f0f0f0' },
+            ticks: {
+              font: { family: 'Roboto', size: 12 },
+              color: '#555',
+              maxRotation: 0,
+            },
+          },
+          y: {
+            min: 1,
+            max: 2.7,
+            grid: { color: '#f0f0f0' },
+            ticks: {
+              callback: v => v.toFixed(1) + '×',
+              font: { family: 'Roboto', size: 12 },
+              color: '#555',
+              stepSize: 0.25,
+            },
+            title: {
+              display: true,
+              text: 'Best Public ÷ Best Private',
+              font: { family: 'Roboto', size: 12, weight: '500' },
+              color: '#555',
+            },
+          },
+        },
+      },
+    });
+
+    // --- Main performance chart ---
     new Chart(ctx, {
       type: 'line',
       data: {
