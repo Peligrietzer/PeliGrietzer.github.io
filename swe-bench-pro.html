@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWE-Bench Pro: AI Performance Over Time</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #fff;
+      color: #2c3e50;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 32px;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 460px;
+      margin-bottom: 36px;
+    }
+
+    .annotations {
+      font-size: 0.85rem;
+      color: #444;
+      margin-bottom: 28px;
+    }
+
+    .annotations h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      margin-bottom: 20px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 2px solid #ddd;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #eee;
+      color: #34495e;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .pub-row td:first-child { color: #2980b9; font-weight: 500; }
+    .priv-row td:first-child { color: #e67e22; font-weight: 500; }
+
+    .note {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .sources {
+      font-size: 0.8rem;
+      color: #777;
+      margin-top: 24px;
+    }
+
+    .sources a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .sources a:hover { text-decoration: underline; }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 28px;
+      font-size: 0.9rem;
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.3rem; }
+      .chart-container { height: 320px; }
+      table { font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-link" href="index.html">&larr; Back</a>
+
+  <h1>SWE-Bench Pro: Highest AI Model Performance Over Time</h1>
+  <p class="subtitle">
+    Peak resolve rates on the <strong>Public</strong> and <strong>Private</strong> (commercial) datasets of
+    <a href="https://scale.com/leaderboard/swe_bench_pro_public" style="color:#3498db">SWE-Bench Pro</a>
+    (Scale AI / SEAL), tracked by the model or agent achieving the top score at each key point in time.
+  </p>
+
+  <div class="chart-container">
+    <canvas id="sweChart"></canvas>
+  </div>
+
+  <div class="annotations">
+    <h2>Data Points</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Dataset</th>
+          <th>Date</th>
+          <th>Best Score</th>
+          <th>Best Model / Agent</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Public -->
+        <tr class="pub-row">
+          <td>Public</td>
+          <td>Nov 2024</td>
+          <td>4.9%</td>
+          <td>GPT-4o (2024-11-20)</td>
+        </tr>
+        <tr class="pub-row">
+          <td>Public</td>
+          <td>May 2025</td>
+          <td>16.3%</td>
+          <td>Claude Sonnet 4 (20250514)</td>
+        </tr>
+        <tr class="pub-row">
+          <td>Public</td>
+          <td>Aug 2025</td>
+          <td>23.3%</td>
+          <td>GPT-5 (2025-08-07) &mdash; SWE-Agent scaffold</td>
+        </tr>
+        <tr class="pub-row">
+          <td>Public</td>
+          <td>Nov 2025</td>
+          <td>45.8%</td>
+          <td>Claude Sonnet 4.5 + Live-SWE-agent</td>
+        </tr>
+        <tr class="pub-row">
+          <td>Public</td>
+          <td>Feb 2026</td>
+          <td>56.8%</td>
+          <td>GPT-5.3-Codex (Codex CLI scaffold)</td>
+        </tr>
+        <!-- Private -->
+        <tr class="priv-row">
+          <td>Private</td>
+          <td>Nov 2024</td>
+          <td>3.6%</td>
+          <td>GPT-4o (2024-11-20)</td>
+        </tr>
+        <tr class="priv-row">
+          <td>Private</td>
+          <td>May 2025</td>
+          <td>9.1%</td>
+          <td>Claude Sonnet 4 (20250514)</td>
+        </tr>
+        <tr class="priv-row">
+          <td>Private</td>
+          <td>Jun 2025</td>
+          <td>10.1%</td>
+          <td>Gemini 2.5 Pro (Preview 06-05)</td>
+        </tr>
+        <tr class="priv-row">
+          <td>Private</td>
+          <td>Aug 2025</td>
+          <td>17.8%</td>
+          <td>Claude Opus 4.1 (20250805)</td>
+        </tr>
+        <tr class="priv-row">
+          <td>Private</td>
+          <td>Nov 2025</td>
+          <td>23.4%</td>
+          <td>Claude Opus 4.5 (20251101)</td>
+        </tr>
+        <tr class="priv-row">
+          <td>Private</td>
+          <td>Dec 2025</td>
+          <td>23.8%</td>
+          <td>GPT-5.2 (2025-12-11)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="note">
+      <strong>Note on scaffolds:</strong> Scores on the public dataset vary substantially by the agentic scaffold used.
+      The Scale AI SEAL leaderboard uses SWE-Agent; higher public scores (45.8%, 56.8%) reflect third-party agents
+      (Live-SWE-agent, Codex CLI) evaluated on the same task set. Private/commercial scores are all from the SEAL leaderboard
+      under a consistent evaluation protocol. Model dates are derived from version strings in model names.
+      The benchmark launched officially in September 2025; models released before this date were evaluated retroactively.
+    </p>
+  </div>
+
+  <div class="sources">
+    <strong>Sources:</strong>
+    <a href="https://scale.com/leaderboard/swe_bench_pro_public">SEAL Public Leaderboard</a> &middot;
+    <a href="https://scale.com/leaderboard/swe_bench_pro_private">SEAL Private Leaderboard</a> &middot;
+    <a href="https://scale.com/blog/swe-bench-pro">Scale AI Blog (Sep 19, 2025)</a> &middot;
+    <a href="https://arxiv.org/abs/2509.16941">arXiv:2509.16941 (SWE-Bench Pro paper)</a> &middot;
+    <a href="https://live-swe-agent.github.io/">Live-SWE-agent Leaderboard</a>
+  </div>
+
+  <script>
+    // Helper: build a stepped "frontier" dataset
+    // Points: [{x: Date string, y: number, label: string}]
+    // Returns a stepped series where y never decreases
+    function buildStepData(points) {
+      // Sort by date
+      const sorted = [...points].sort((a, b) => new Date(a.x) - new Date(b.x));
+      // Build step-line: for each consecutive pair, insert an intermediate point
+      const result = [];
+      for (let i = 0; i < sorted.length; i++) {
+        if (i > 0) {
+          // Horizontal step: keep previous y until current x
+          result.push({ x: sorted[i].x, y: sorted[i - 1].y });
+        }
+        result.push({ x: sorted[i].x, y: sorted[i].y, label: sorted[i].label });
+      }
+      return result;
+    }
+
+    const publicPoints = [
+      { x: '2024-11-20', y: 4.9,  label: 'GPT-4o\n4.9%' },
+      { x: '2025-05-14', y: 16.3, label: 'Claude Sonnet 4\n16.3%' },
+      { x: '2025-08-07', y: 23.3, label: 'GPT-5\n23.3%' },
+      { x: '2025-11-01', y: 45.8, label: 'Claude Sonnet 4.5\n+ Live-SWE-agent\n45.8%' },
+      { x: '2026-02-01', y: 56.8, label: 'GPT-5.3-Codex\n56.8%' },
+    ];
+
+    const privatePoints = [
+      { x: '2024-11-20', y: 3.6,  label: 'GPT-4o\n3.6%' },
+      { x: '2025-05-14', y: 9.1,  label: 'Claude Sonnet 4\n9.1%' },
+      { x: '2025-06-05', y: 10.1, label: 'Gemini 2.5 Pro\n10.1%' },
+      { x: '2025-08-05', y: 17.8, label: 'Claude Opus 4.1\n17.8%' },
+      { x: '2025-11-01', y: 23.4, label: 'Claude Opus 4.5\n23.4%' },
+      { x: '2025-12-11', y: 23.8, label: 'GPT-5.2\n23.8%' },
+    ];
+
+    const pubStep  = buildStepData(publicPoints);
+    const privStep = buildStepData(privatePoints);
+
+    const ctx = document.getElementById('sweChart').getContext('2d');
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'Public Dataset (best score)',
+            data: pubStep,
+            borderColor: '#2980b9',
+            backgroundColor: 'rgba(41,128,185,0.08)',
+            pointBackgroundColor: pubStep.map(p => p.label ? '#2980b9' : 'transparent'),
+            pointBorderColor:     pubStep.map(p => p.label ? '#2980b9' : 'transparent'),
+            pointRadius:          pubStep.map(p => p.label ? 6 : 0),
+            pointHoverRadius:     pubStep.map(p => p.label ? 8 : 0),
+            borderWidth: 2.5,
+            tension: 0,
+            fill: true,
+            stepped: false, // we pre-built the steps
+          },
+          {
+            label: 'Private Dataset (best score)',
+            data: privStep,
+            borderColor: '#e67e22',
+            backgroundColor: 'rgba(230,126,34,0.08)',
+            pointBackgroundColor: privStep.map(p => p.label ? '#e67e22' : 'transparent'),
+            pointBorderColor:     privStep.map(p => p.label ? '#e67e22' : 'transparent'),
+            pointRadius:          privStep.map(p => p.label ? 6 : 0),
+            pointHoverRadius:     privStep.map(p => p.label ? 8 : 0),
+            borderWidth: 2.5,
+            tension: 0,
+            fill: true,
+            stepped: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: { family: 'Roboto', size: 13 },
+              color: '#2c3e50',
+              padding: 20,
+              usePointStyle: true,
+              pointStyleWidth: 12,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              title(items) {
+                const d = new Date(items[0].parsed.x);
+                return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+              },
+              label(item) {
+                const pt = item.dataset.data[item.dataIndex];
+                const base = `${item.dataset.label}: ${item.parsed.y.toFixed(1)}%`;
+                if (pt.label) return [base, '  ' + pt.label.replace(/\n/g, ' ')];
+                return base;
+              },
+            },
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            borderColor: '#ddd',
+            borderWidth: 1,
+            titleColor: '#2c3e50',
+            bodyColor: '#34495e',
+            titleFont: { family: 'Roboto', weight: '600', size: 13 },
+            bodyFont: { family: 'Roboto', size: 12 },
+            padding: 12,
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'month',
+              tooltipFormat: 'MMM yyyy',
+              displayFormats: { month: 'MMM yy' },
+            },
+            min: '2024-10-01',
+            max: '2026-03-01',
+            grid: { color: '#f0f0f0' },
+            ticks: {
+              font: { family: 'Roboto', size: 12 },
+              color: '#555',
+              maxRotation: 0,
+            },
+            title: {
+              display: false,
+            },
+          },
+          y: {
+            min: 0,
+            max: 65,
+            grid: { color: '#f0f0f0' },
+            ticks: {
+              callback: v => v + '%',
+              font: { family: 'Roboto', size: 12 },
+              color: '#555',
+              stepSize: 10,
+            },
+            title: {
+              display: true,
+              text: 'Resolve Rate (% tasks solved)',
+              font: { family: 'Roboto', size: 12, weight: '500' },
+              color: '#555',
+            },
+          },
+        },
+      },
+    });
+  </script>
+
+</body>
+</html>
