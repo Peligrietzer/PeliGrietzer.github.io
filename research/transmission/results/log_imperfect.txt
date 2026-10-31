@@ -1,0 +1,16 @@
+imperfect teacher N=64: excess over saturated teacher 2.150e-03
+imperfect teacher N=256: excess over saturated teacher 1.064e-03
+imperfect teacher N=1024: excess over saturated teacher 8.356e-05
+imperfect teacher N=4096: excess over saturated teacher 2.127e-05
+  10/102 jobs  (27s)
+  20/102 jobs  (46s)
+  30/102 jobs  (69s)
+  40/102 jobs  (81s)
+  50/102 jobs  (93s)
+  60/102 jobs  (106s)
+  70/102 jobs  (120s)
+  80/102 jobs  (131s)
+  90/102 jobs  (141s)
+  100/102 jobs  (155s)
+  102/102 jobs  (156s)
+QUEUE_DONE

@@ -1,0 +1,11 @@
+restart 0: subsample loss 6.192736e-03
+restart 1: subsample loss 6.188988e-03
+restart 2: subsample loss 6.343592e-03
+restart 3: subsample loss 6.007440e-03
+restart 4: subsample loss 6.188829e-03
+restart 5: subsample loss 6.048406e-03
+restart 6: subsample loss 6.002592e-03
+restart 7: subsample loss 6.187897e-03
+restarts done (98s)
+teacher full-sample loss 6.01177219e-03, LM iters 137
+teacher test risk 0.006090946616320864
